@@ -1,0 +1,23 @@
+#! /usr/bin/env python2.7
+
+import numpy as np
+
+__author__ = "Adam Richardson"
+
+
+class SigRound:
+    def __init__(self, sig_figs):
+        self.alpha = np.log10(2)
+        self.sig_figs = int(sig_figs)
+        if self.sig_figs <= 0:
+            raise ValueError("Invalid number of significant figures")
+
+    def round_sigs(self, number):
+        mantissa, exponent = np.frexp(number)
+        fractional_number = (self.alpha * exponent) - np.floor(self.alpha * exponent)
+        exponent_10 = (np.floor(self.alpha * exponent))
+        mantissa_10 = (mantissa * np.power(10, fractional_number))
+        index = abs(mantissa_10) < 1
+        mantissa_10[index] *= 10
+        exponent_10[index] -= 1
+        return (np.round(mantissa_10, self.sig_figs - 1)) * np.power(10, exponent_10)
